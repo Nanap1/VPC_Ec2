@@ -1,0 +1,205 @@
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This is template is to create VPC",
+    "Metadata": {
+
+    },
+    "Parameters": {
+    
+    "AZA": {
+        "Description": "this is for availability zone A",
+        "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+
+    "AZB": {
+        "Description": "this is for availability zone B",
+        "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    
+    "Pubsub1cidr": {
+        "Description": "This is for pubsub1  CIDR",
+        "Type": "String"
+    },
+
+    "Pubsub2cidr": {
+        "Description": "This is for pubsub2 CIDR",
+        "Type": "String"
+    },
+
+    
+    "Prvsub1cidr": {
+        "Description": "This is for prvsub1 CIDR",
+        "Type": "String"
+    },
+
+    "Prvsub2cidr": {
+        "Description": "This is for prvsub2 CIDR",
+        "Type": "String"
+    },
+
+    "VPCcidr": {
+        "Description": "This is for VPC CIDR",
+        "Type": "String"
+    } 
+
+    },
+    "Mappings": {
+
+    },
+    "Conditions": {
+
+    },
+    "Resources": {
+    "NanaVPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": { "Ref": "VPCcidr" },   
+        "Tags":[{ "Key": "name", "Value":  "NanaVPC" } ]
+      }
+    }, 
+    
+    "NanaVPCIgw": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags":[{ "Key": "name", "Value":  "NanaVPCIgw" } ]
+      }
+    },
+    "AttachGateway": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": { "Ref": "NanaVPC" },
+        "InternetGatewayId": { "Ref": "NanaVPCIgw" }
+      }
+    },
+
+    
+    "NanaVPCRTB": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": { "Ref": "NanaVPC" },
+        "Tags":[{ "Key": "name", "Value":  "NanaVPCRTB" } ]
+      }
+    },
+
+    
+    "PubRT1": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": { "Ref": "NanaVPCRTB" } ,
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": { "Ref": "NanaVPCIgw" }
+      }
+    },
+
+    
+    "PubsubAss1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "NanaVPCpubsub1" },
+        "RouteTableId": { "Ref": "NanaVPCRTB" }
+      }
+    },
+
+    "PubsubAss2": {
+        "Type": "AWS::EC2::SubnetRouteTableAssociation",
+        "Properties": {
+          "SubnetId": { "Ref": "NanaVPCpubsub2" },
+          "RouteTableId": { "Ref": "NanaVPCRTB" }
+        }
+      },
+    
+    
+    "NanaVPCpubsub1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "AZA" },
+        "MapPublicIpOnLaunch": "true",
+        "VpcId": { "Ref": "NanaVPC" },
+        "CidrBlock": { "Ref": "Pubsub1cidr" },
+         "Tags":[{ "Key": "name", "Value":  "NanaVPCpubsub1" } ]
+      }
+    },
+    
+    "NanaVPCpubsub2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "AZB" },
+        "MapPublicIpOnLaunch": "true",
+        "VpcId": { "Ref": "NanaVPC" },
+        "CidrBlock": { "Ref": "Pubsub2cidr" },
+         "Tags":[{ "Key": "name", "Value":  "NanaVPCpubsub2" } ]
+      }
+    },
+    
+    "NanaVPCprvsub1": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+            "AvailabilityZone": { "Ref": "AZA" },
+          "VpcId": { "Ref": "NanaVPC" },
+          "CidrBlock": { "Ref": "Prvsub1cidr" },
+          "Tags":[{ "Key": "name", "Value":  "NanaVPCprvsub1" } ]
+        }
+      },
+      
+      "NanaVPCprvsub2": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+            "AvailabilityZone": { "Ref": "AZB" },
+          "VpcId": { "Ref": "NanaVPC" },
+          "CidrBlock": { "Ref": "Prvsub2cidr" },
+          "Tags":[{ "Key": "name", "Value":  "NanaVPCprvsub2" } ]
+        }
+      },
+
+    "nanawebserver": {
+        "Type": "AWS::EC2::Instance",
+        "Properties": {
+            "KeyName": "Linuxkey",
+            "DisableApiTermination": "false",
+            "ImageId": "ami-0b5eea76982371e91",
+            "InstanceType": "t2.micro",
+            "SubnetId":{"Ref":"NanaVPCpubsub1"},
+            "Monitoring": "false",
+            "SecurityGroupIds" : [{ "Ref": "nanawebserversg" }],
+            "Tags": [{"Key": "name","Value": "nanawebserver"}]     
+      }
+    },
+    
+    "nanawebserversg" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "This is used for my webserver",
+        "SecurityGroupIngress" : [{ 
+          "IpProtocol": "tcp",
+        "FromPort": 80,
+        "ToPort": 80,
+        "CidrIp": "0.0.0.0/0"
+    },
+    {
+        "IpProtocol": "tcp",
+        "FromPort": 443,
+        "ToPort": 443,
+        "CidrIp": "0.0.0.0/0"
+    },
+    {
+        "IpProtocol": "tcp",
+        "FromPort": 22,
+        "ToPort": 22,
+        "CidrIp": "0.0.0.0/0"
+    },
+    {
+      "IpProtocol": "tcp",
+        "FromPort": 3389,
+        "ToPort": 3389,
+        "CidrIp": "0.0.0.0/0"}],
+        "VpcId" : { "Ref": "NanaVPC" },
+        "Tags": [{"Key": "name","Value": "nanawebserversg"}] 
+      }
+    }
+    
+
+    },
+    "Outputs": {
+
+    }
+}

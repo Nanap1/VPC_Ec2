@@ -1,0 +1,52 @@
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This is template is to create VPC",
+    "Metadata": {
+
+    },
+    "Parameters": {
+    
+    },
+    "Mappings": {
+
+    },
+    "Conditions": {
+
+    },
+    "Resources": {
+    "NanaVPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",   
+        "Tags":[{ "Key": "name", "Value":  "NanaVPC" } ]
+      }
+    }, 
+    
+    "NanaVPCpubsub1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": "us-east-1a",
+        "VpcId": { "Ref": "NanaVPC" },
+        "CidrBlock": "10.0.1.0/24",
+         "Tags":[{ "Key": "name", "Value":  "NanaVPCpubsub1" } ]
+      }
+    },
+    
+    "NanaVPCprvsub1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": "us-east-1a",
+        "VpcId": { "Ref": "NanaVPC" },
+        "CidrBlock": "10.0.2.0/24",
+        "Tags":[{ "Key": "name", "Value":  "NanaVPCprvsub1" } ]
+      }
+    }
+    
+    
+    
+
+    },
+    "Outputs": {
+
+    }
+}
