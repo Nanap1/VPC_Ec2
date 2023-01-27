@@ -8,38 +8,46 @@
     
     "AZA": {
         "Description": "this is for availability zone A",
-        "Type": "AWS::EC2::AvailabilityZone::Name"
+        "Type": "AWS::EC2::AvailabilityZone::Name",
+        "Default": "us-east-1a"
+
     },
 
     "AZB": {
         "Description": "this is for availability zone B",
-        "Type": "AWS::EC2::AvailabilityZone::Name"
+        "Type": "AWS::EC2::AvailabilityZone::Name",
+        "Default": "us-east-1b"
     },
     
     "Pubsub1cidr": {
         "Description": "This is for pubsub1  CIDR",
-        "Type": "String"
+        "Type": "String",
+        "Default": "10.0.4.0/24"
     },
 
     "Pubsub2cidr": {
         "Description": "This is for pubsub2 CIDR",
-        "Type": "String"
+        "Type": "String",
+        "Default": "10.0.3.0/24"
     },
 
     
     "Prvsub1cidr": {
         "Description": "This is for prvsub1 CIDR",
-        "Type": "String"
+        "Type": "String",
+        "Default": "10.0.2.0/24"
     },
 
     "Prvsub2cidr": {
         "Description": "This is for prvsub2 CIDR",
-        "Type": "String"
+        "Type": "String",
+        "Default": "10.0.1.0/24"
     },
 
     "VPCcidr": {
         "Description": "This is for VPC CIDR",
-        "Type": "String"
+        "Type": "String",
+        "Default": "10.0.0.0/16"
     } 
 
     },
